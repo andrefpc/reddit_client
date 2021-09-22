@@ -20,12 +20,22 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/activity_main_drawer"
         app:headerLayout="@layout/nav_header_main">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/post_list"
+
+        <ViewFlipper
+            android:id="@+id/rebuy_vf"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/nav_header_height"/>
+            android:layout_marginTop="@dimen/nav_header_height"
+            android:inAnimation="@anim/fade_in_transition"
+            android:outAnimation="@anim/fade_out_transition">
+
+            <include layout="@layout/error_layout"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/post_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </ViewFlipper>
     </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>
