@@ -10,13 +10,17 @@ class RedditRepositoryImpl(
     private val redditApi: RedditApi
 ) : RedditRepository {
     override suspend fun getPosts(
-        limit: String,
-        lastItemName: String
+        lastItemName: String?
     ): ApiResult<List<RedditChild>> {
-        val params: HashMap<String, String> = hashMapOf(
-            "limit" to limit,
-            "after" to lastItemName
-        )
+        val params: HashMap<String, String> = if(lastItemName != null) {
+            hashMapOf(
+                "limit" to "10",
+                "after" to lastItemName
+            )
+        }else{
+            hashMapOf( "limit" to "10" )
+        }
+
         val response: Response<RedditResult> = redditApi.getPosts(params)
         if (!response.isSuccessful) {
             return ApiResult.Error
