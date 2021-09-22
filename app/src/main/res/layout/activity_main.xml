@@ -30,6 +30,10 @@
             android:inAnimation="@anim/fade_in_transition"
             android:outAnimation="@anim/fade_out_transition">
 
+            <include
+                android:id="@+id/post_loading"
+                layout="@layout/loading_layout"/>
+
             <include layout="@layout/error_layout"/>
 
             <androidx.recyclerview.widget.RecyclerView

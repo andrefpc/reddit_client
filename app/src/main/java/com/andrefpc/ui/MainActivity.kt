@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.uiState.observe(this, {
             when(it){
                 UIState.Loading -> {
-
                 }
                 UIState.Error -> {
 

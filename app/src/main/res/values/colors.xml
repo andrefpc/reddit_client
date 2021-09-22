@@ -5,4 +5,8 @@
     <color name="purple_700">#FF000000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <color name="light_loading">#B3B3B3</color>
+    <color name="dark_loading">#737373</color>
 </resources>
