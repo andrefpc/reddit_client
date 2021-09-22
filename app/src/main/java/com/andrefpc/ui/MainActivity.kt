@@ -2,6 +2,7 @@ package com.andrefpc.ui
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.andrefpc.R
 import com.andrefpc.data.UIState
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupActionBar()
         setupViewModelObservers()
+        binding.drawerLayout.open()
         viewModel.getPosts()
     }
 
@@ -32,12 +34,17 @@ class MainActivity : AppCompatActivity() {
         viewModel.uiState.observe(this, {
             when(it){
                 UIState.Loading -> {
+                    if (binding.postsViewFlipper.displayedChild == LOADING_LAYOUT) return@observe
+                    binding.postsViewFlipper.displayedChild = LOADING_LAYOUT
                 }
                 UIState.Error -> {
-
+                    if (binding.postsViewFlipper.displayedChild == ERROR_LAYOUT) return@observe
+                    binding.postsViewFlipper.displayedChild = ERROR_LAYOUT
                 }
                 is UIState.Success -> {
                     val children = it.children
+                    if (binding.postsViewFlipper.displayedChild == SUCCESS_LAYOUT) return@observe
+                    binding.postsViewFlipper.displayedChild = SUCCESS_LAYOUT
                 }
             }
         })
@@ -48,5 +55,11 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout.open()
         }
         return super.onOptionsItemSelected(menuItem)
+    }
+
+    companion object{
+        const val LOADING_LAYOUT = 0
+        const val ERROR_LAYOUT = 1
+        const val SUCCESS_LAYOUT = 2
     }
 }

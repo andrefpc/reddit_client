@@ -18,19 +18,19 @@ class MainViewModel(
     val uiState: LiveData<UIState> get() = _uiState
 
     fun getPosts( lastItemName: String? = null){
-        _uiState.value = UIState.Loading
+        if(lastItemName == null) _uiState.value = UIState.Loading
         viewModelScope.launch(dispatchers.IO) {
             when (
                 val result = redditRepository.getPosts(lastItemName)
             ) {
                 is ApiResult.Error -> {
-                    _uiState.postValue(UIState.Error)
+                    if(lastItemName == null) _uiState.postValue(UIState.Error)
                 }
                 is ApiResult.Success -> {
                     result.result?.let {
                         _uiState.postValue(UIState.Success(it))
                     } ?: kotlin.run {
-                        _uiState.postValue(UIState.Error)
+                        if(lastItemName == null) _uiState.postValue(UIState.Error)
                     }
                 }
             }

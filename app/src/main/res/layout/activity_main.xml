@@ -23,21 +23,19 @@
         app:headerLayout="@layout/nav_header_main">
 
         <ViewFlipper
-            android:id="@+id/rebuy_vf"
+            android:id="@+id/posts_view_flipper"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/nav_header_height"
             android:inAnimation="@anim/fade_in_transition"
             android:outAnimation="@anim/fade_out_transition">
 
-            <include
-                android:id="@+id/post_loading"
-                layout="@layout/loading_layout"/>
+            <include layout="@layout/loading_layout"/>
 
             <include layout="@layout/error_layout"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/post_list"
+                android:id="@+id/posts_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </ViewFlipper>
