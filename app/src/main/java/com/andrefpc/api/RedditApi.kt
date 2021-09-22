@@ -10,5 +10,5 @@ interface RedditApi {
      * Get Reddit posts
      */
     @GET("/top.json")
-    suspend fun getDeliverer(@QueryMap params: HashMap<String, String>): Response<RedditResult>
+    suspend fun getPosts(@QueryMap params: HashMap<String, String>): Response<RedditResult>
 }

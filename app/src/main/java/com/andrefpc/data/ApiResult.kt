@@ -1,6 +1,6 @@
 package com.andrefpc.data
 
 sealed class ApiResult<out T> {
-    class Error(val error: String?) : ApiResult<Empty>()
+    object Error : ApiResult<Nothing>()
     class Success<T>(val result: T?) : ApiResult<T>()
 }
