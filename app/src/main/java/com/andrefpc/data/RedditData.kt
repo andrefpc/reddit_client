@@ -10,6 +10,35 @@ data class RedditData(
     @SerializedName("subreddit") val subreddit: String,
     @SerializedName("created") val created: Long,
     @SerializedName("thumbnail") val thumbnail: String,
-    @SerializedName("num_comments") val numComments: String,
+    @SerializedName("num_comments") val numComments: Int,
     @SerializedName("secure_media") val media: RedditMedia
-) : Serializable
+) : Serializable {
+    fun getTime(): String {
+        val now = System.currentTimeMillis()
+        val diff = now - (this.created * 1000)
+        val minutes: Long = diff / 1000 / 60
+        if (minutes < 60) {
+            return "$minutes minutes ago"
+        }
+        val hours: Long = minutes / 60
+        if (hours < 24) {
+            return "$hours hours ago"
+        }
+        val days: Long = hours / 24
+        return "$days days ago"
+    }
+
+    fun getComments(): String {
+        return when (numComments) {
+            0 -> {
+                "Without comments"
+            }
+            1 -> {
+                "$numComments comment"
+            }
+            else -> {
+                "$numComments comments"
+            }
+        }
+    }
+}

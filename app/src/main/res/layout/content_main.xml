@@ -17,8 +17,6 @@
         <include
             android:id="@+id/empty_layout"
             layout="@layout/empty_layout" />
-
     </ViewFlipper>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

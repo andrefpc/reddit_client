@@ -6,5 +6,5 @@ import java.io.Serializable
 
 data class RedditChild(
     @SerializedName("data") val data: RedditData,
-    @Expose var unreadStatus: String
+    @Expose var read: Boolean = false
 ): Serializable
