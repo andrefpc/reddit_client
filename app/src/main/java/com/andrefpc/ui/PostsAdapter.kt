@@ -1,12 +1,19 @@
 package com.andrefpc.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.andrefpc.data.RedditChild
 import com.andrefpc.data.RedditData
 import com.andrefpc.databinding.PostLayoutBinding
 import com.andrefpc.extensions.ImageViewExtensions.loadImage
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import com.andrefpc.extensions.ViewExtensions.blink
+import com.andrefpc.extensions.ViewExtensions.collapseHorizontal
+import com.andrefpc.extensions.ViewExtensions.stopBlink
+
 
 class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val postList: ArrayList<RedditChild> = arrayListOf()
@@ -32,16 +39,10 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyItemRangeInserted(positionStart, list.size)
     }
 
-    fun removePost(name: String){
+    private fun removePost(name: String){
         val index = postList.indexOfFirst { it.data.name == name }
         postList.removeAt(index)
         notifyItemRemoved(index)
-    }
-
-    fun updateReadState(name: String){
-        val index = postList.indexOfFirst { it.data.name == name }
-        postList[index].read = true
-        notifyItemChanged(index)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -55,14 +56,20 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         val holder = viewHolder as PostsViewHolder
-        val data: RedditData = postList[position].data
-
+        val child: RedditChild = postList[position]
+        val data: RedditData = child.data
         holder.binding.postAuthor.text = data.author
         holder.binding.postImage.loadImage(data.thumbnail)
         holder.binding.postText.text = data.title
         holder.binding.postTime.text = data.getTime()
         holder.binding.postComments.text = data.getComments()
-        holder.binding.root.setOnClickListener { selectListener(data) }
+        if(!child.read) holder.binding.postRead.blink()
+        else holder.binding.postRead.visibility = View.GONE
+        holder.binding.root.setOnClickListener {
+            holder.binding.postRead.stopBlink()
+            holder.binding.postRead.collapseHorizontal()
+            selectListener(data)
+        }
         holder.binding.postClear.setOnClickListener { removePost(data.name) }
     }
 
