@@ -16,11 +16,23 @@ class MainViewModel(
     private val redditRepository: RedditRepository,
     private val imageUtil: ImageUtil
 ): ViewModel() {
+    /**
+     * This param will be saved when the opened post have an image to Download
+     */
     var currentImageUrl: String? = null
 
+    /**
+     * LiveData to change the UiState
+     */
     private val _uiState = MutableLiveData<UIState>()
     val uiState: LiveData<UIState> get() = _uiState
 
+    /**
+     * Get the list of posts from the api to replace the current list
+     * or to be added in the end of the list
+     * @param lastItemName The last post name from the loaded list to pagination (non-required)
+     * @param refresh Param to verify if the list will replace the current one or just to be added
+     */
     fun getPosts( lastItemName: String? = null, refresh: Boolean){
         if(refresh) _uiState.value = UIState.Loading
         viewModelScope.launch(dispatchers.IO) {
@@ -42,6 +54,9 @@ class MainViewModel(
         }
     }
 
+    /**
+     * Save the current opened image on gallery
+     */
     fun saveCurrentImage(){
         viewModelScope.launch(dispatchers.IO) {
             currentImageUrl?.let {  imageUtil.saveImageOnGallery(it) }

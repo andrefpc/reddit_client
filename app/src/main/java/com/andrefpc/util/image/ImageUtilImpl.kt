@@ -13,11 +13,19 @@ import java.util.*
 class ImageUtilImpl(
     private val context: Context
 ) : ImageUtil {
+    /**
+     * Download a image using glide and call the saveImage method sending the downloaded bitmap
+     * @param url Image Url
+     */
     override suspend fun saveImageOnGallery(url: String) {
         val bitmap = Glide.with(context).asBitmap().load(url).submit().get()
         saveImage(bitmap)
     }
 
+    /**
+     * Create the image file from a bitmap
+     * @param image Image Bitmap downloaded from Glide
+     */
     private fun saveImage(image: Bitmap?) {
         val values = ContentValues()
         val fileName = "reddit_client_" + Date().time + ".jpg"
@@ -47,6 +55,10 @@ class ImageUtilImpl(
 
     }
 
+    /**
+     * Tell to gallery that have a new image saved on the phone
+     * @param imagePath Path of the generated image
+     */
     private fun galleryAddPic(imagePath: String) {
         val file = File(imagePath)
         MediaScannerConnection.scanFile(

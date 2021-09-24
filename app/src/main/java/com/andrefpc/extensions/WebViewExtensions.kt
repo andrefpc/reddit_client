@@ -6,6 +6,10 @@ import com.andrefpc.data.RedditEmbed
 
 
 object WebViewExtensions {
+    /**
+     * Load an embed iframe into a WebView
+     * @param embed The params to be embed
+     */
     fun WebView.loadEmbed(embed: RedditEmbed) {
         this.setInitialScale(1)
         this.settings.allowFileAccess = true

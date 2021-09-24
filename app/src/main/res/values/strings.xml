@@ -7,4 +7,6 @@
     <string name="clear_button">DISMISS LIST AND RELOAD</string>
     <string name="dismiss_post">Dismiss Post</string>
     <string name="download_image">Download</string>
+    <string name="permission_not_granted">You don`t give permission to do this action</string>
+    <string name="image_save_on_galery">Image saved on gallery</string>
 </resources>

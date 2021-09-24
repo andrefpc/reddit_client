@@ -7,6 +7,9 @@ import com.andrefpc.extensions.ViewExtensions.blink
 import com.andrefpc.extensions.ViewExtensions.stopBlink
 
 object ViewExtensions {
+    /**
+     * Start a blink animation for a View
+     */
     fun View.blink() {
         this.alpha = 1.0f
         this.visibility = View.VISIBLE
@@ -18,6 +21,9 @@ object ViewExtensions {
         this.startAnimation(anim)
     }
 
+    /**
+     * Stop the blink animation and hide the View
+     */
     fun View.stopBlink() {
         this.alpha = 0.0f
         this.visibility = View.GONE

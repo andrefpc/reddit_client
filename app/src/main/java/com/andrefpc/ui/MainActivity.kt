@@ -32,33 +32,56 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initListeners()
-        initPosts()
+        setupPostsRecyclerView()
+        setupListeners()
         setupActionBar()
         setupViewModelObservers()
         binding.drawerLayout.open()
         viewModel.getPosts(refresh = true)
     }
 
-    private fun initPosts() {
+    /**
+     * Setup the RecyclerView with the adapter
+     */
+    private fun setupPostsRecyclerView() {
         postsAdapter = PostsAdapter()
         layoutManager = LinearLayoutManager(this)
         binding.postsList.layoutManager = layoutManager
         binding.postsList.adapter = postsAdapter
+        listenScroll()
+    }
+
+    /**
+     * Setup the listeners of the activity
+     */
+    private fun setupListeners() {
+        binding.appBarMain.contentMain.emptyLayout.emptyButton.setOnClickListener {
+            binding.drawerLayout.open()
+        }
+        binding.clearButton.setOnClickListener {
+            val lastItemName = postsAdapter?.getLastItemName()
+            viewModel.getPosts(lastItemName, true)
+        }
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.getPosts(refresh = true)
+            binding.swipeRefresh.isRefreshing = false
+        }
         postsAdapter?.onSelect {
             binding.drawerLayout.close()
             openContent(it)
         }
         postsAdapter?.onRemove {
             countRemoved++
-            if(countRemoved == 5){
+            if (countRemoved == 5) {
                 addItemsToList()
                 countRemoved = 0
             }
         }
-        listenScroll()
     }
 
+    /**
+     * Open the selected post data on the main layout
+     */
     private fun openContent(data: RedditData) {
         binding.appBarMain.toolbar.title = data.author
         binding.appBarMain.contentMain.contentLayout.setupLayout(data)
@@ -72,34 +95,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initListeners() {
-        binding.appBarMain.contentMain.emptyLayout.emptyButton.setOnClickListener {
-            binding.drawerLayout.open()
-        }
-        binding.clearButton.setOnClickListener {
-            val lastItemName = postsAdapter?.getLastItemName()
-            viewModel.getPosts(lastItemName, true)
-        }
-        binding.swipeRefresh.setOnRefreshListener {
-            viewModel.getPosts(refresh = true)
-            binding.swipeRefresh.isRefreshing = false
-        }
-    }
-
+    /**
+     * Show the download button on the toolbar
+     */
     private fun showDownloadButton() {
         menu?.findItem(R.id.download_image)?.isVisible = true
     }
 
+    /**
+     * Hide the download button on the toolbar
+     */
     private fun hideDownloadButton() {
         menu?.findItem(R.id.download_image)?.isVisible = false
     }
 
+    /**
+     * Setup the action bar
+     */
     private fun setupActionBar() {
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_drawer)
     }
 
+    /**
+     * Setup the ViewModel Observers
+     */
     private fun setupViewModelObservers() {
         viewModel.uiState.observe(this, {
             when (it) {
@@ -127,6 +148,9 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * Create the menu itens on toolbar
+     */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         this.menu = menu
@@ -134,19 +158,25 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    /**
+     * Listen for menu buttons clicks
+     */
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             android.R.id.home -> binding.drawerLayout.open()
             R.id.download_image -> {
-                if(haveExternalStoragePermission()) {
+                if (haveExternalStoragePermission()) {
                     viewModel.saveCurrentImage()
-                    Toast.makeText(this, "Image saved on gallery", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.image_save_on_galery, Toast.LENGTH_SHORT).show()
                 }
             }
         }
         return super.onOptionsItemSelected(menuItem)
     }
 
+    /**
+     * Listen for scroll events to do the endless scroll (pagination)
+     */
     private fun listenScroll() {
         onScrollListener = object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -163,12 +193,18 @@ class MainActivity : AppCompatActivity() {
         onScrollListener?.let { binding.postsList.addOnScrollListener(it) }
     }
 
+    /**
+     * Call the method to get posts from the api to add to the current list
+     */
     private fun addItemsToList() {
         val lastItemName = postsAdapter?.getLastItemName()
         viewModel.getPosts(lastItemName, false)
         loading = true
     }
 
+    /**
+     * Verify if user gives the permission to write on external storage
+     */
     private fun haveExternalStoragePermission(): Boolean {
         return if (ActivityCompat.checkSelfPermission(
                 this,
@@ -186,6 +222,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Listen to permission results
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -195,11 +234,7 @@ class MainActivity : AppCompatActivity() {
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             viewModel.saveCurrentImage()
         } else {
-            Toast.makeText(
-                this,
-                "You don't give permission to do this action",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, R.string.permission_not_granted, Toast.LENGTH_SHORT).show()
         }
     }
 

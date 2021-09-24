@@ -17,18 +17,32 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var selectListener: (RedditData) -> Unit = { }
     private var removeListener: () -> Unit = { }
 
+    /**
+     * Listener to listen to post selections
+     */
     fun onSelect(selectListener: (RedditData) -> Unit) {
         this.selectListener = selectListener
     }
 
+    /**
+     * Listener to listen to post removals
+     */
     fun onRemove(removeListener: () -> Unit) {
         this.removeListener = removeListener
     }
 
+    /**
+     * Get the last post name of the current list to pass to api to do pagination
+     * @return The name of the last post
+     */
     fun getLastItemName(): String {
         return postList[postList.size - 1].data.name
     }
 
+    /**
+     * Refresh the full list of the recyclerView
+     * @param list The new list to be shown
+     */
     fun refreshList(list: List<RedditChild>) {
         if (postList.isNotEmpty()) {
             val oldListCount = postList.size
@@ -39,12 +53,20 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyItemRangeInserted(0, list.size)
     }
 
+    /**
+     * Add the list on the end of the recyclerView current list
+     * @param list The new list to be added
+     */
     fun addList(list: List<RedditChild>) {
         val positionStart = postList.size
         postList.addAll(list)
         notifyItemRangeInserted(positionStart, list.size)
     }
 
+    /**
+     * Remove a post from the RecyclerView
+     * @param name The name of the post to be removed
+     */
     private fun removePost(name: String){
         val index = postList.indexOfFirst { it.data.name == name }
         postList.removeAt(index)
@@ -88,5 +110,9 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return postList.size
     }
 
+    /**
+     * The ViewHolder to be used on the adapter
+     * @param binding The layout binding
+     */
     class PostsViewHolder(val binding: PostLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 }
