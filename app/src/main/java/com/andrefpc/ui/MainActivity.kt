@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBar()
         setupViewModelObservers()
         binding.drawerLayout.open()
-        viewModel.getPosts()
+        viewModel.getPosts(refresh = true)
     }
 
     private fun initPosts() {
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         postsAdapter?.onRemove {
             countRemoved++
             if(countRemoved == 5){
-                reloadList()
+                addItemsToList()
                 countRemoved = 0
             }
         }
@@ -62,6 +62,10 @@ class MainActivity : AppCompatActivity() {
     private fun initListeners() {
         binding.appBarMain.contentMain.emptyLayout.emptyButton.setOnClickListener {
             binding.drawerLayout.open()
+        }
+        binding.clearButton.setOnClickListener {
+            val lastItemName = postsAdapter?.getLastItemName()
+            viewModel.getPosts(lastItemName, true)
         }
     }
 
@@ -113,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                     val totalItemCount: Int = manager.itemCount
                     val pastVisibleItems: Int = manager.findFirstVisibleItemPosition()
                     if (!loading && pastVisibleItems + visibleItemCount >= totalItemCount - 5) {
-                        reloadList()
+                        addItemsToList()
                     }
                 }
             }
@@ -121,9 +125,9 @@ class MainActivity : AppCompatActivity() {
         onScrollListener?.let { binding.postsList.addOnScrollListener(it) }
     }
 
-    private fun reloadList() {
+    private fun addItemsToList() {
         val lastItemName = postsAdapter?.getLastItemName()
-        viewModel.getPosts(lastItemName)
+        viewModel.getPosts(lastItemName, false)
         loading = true
     }
 

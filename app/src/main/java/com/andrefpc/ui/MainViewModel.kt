@@ -17,21 +17,21 @@ class MainViewModel(
     private val _uiState = MutableLiveData<UIState>()
     val uiState: LiveData<UIState> get() = _uiState
 
-    fun getPosts( lastItemName: String? = null){
-        if(lastItemName == null) _uiState.value = UIState.Loading
+    fun getPosts( lastItemName: String? = null, refresh: Boolean){
+        if(refresh) _uiState.value = UIState.Loading
         viewModelScope.launch(dispatchers.IO) {
             when (
                 val result = redditRepository.getPosts(lastItemName)
             ) {
                 is ApiResult.Error -> {
-                    if(lastItemName == null) _uiState.postValue(UIState.Error)
+                    if(refresh) _uiState.postValue(UIState.Error)
                 }
                 is ApiResult.Success -> {
                     result.result?.let {
-                        if(lastItemName == null) _uiState.postValue(UIState.RefreshList(it))
+                        if(refresh) _uiState.postValue(UIState.RefreshList(it))
                         else _uiState.postValue(UIState.AddList(it))
                     } ?: kotlin.run {
-                        if(lastItemName == null) _uiState.postValue(UIState.Error)
+                        if(refresh) _uiState.postValue(UIState.Error)
                     }
                 }
             }
