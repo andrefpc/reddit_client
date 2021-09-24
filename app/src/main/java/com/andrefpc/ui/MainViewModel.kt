@@ -28,7 +28,8 @@ class MainViewModel(
                 }
                 is ApiResult.Success -> {
                     result.result?.let {
-                        _uiState.postValue(UIState.Success(it))
+                        if(lastItemName == null) _uiState.postValue(UIState.RefreshList(it))
+                        else _uiState.postValue(UIState.AddList(it))
                     } ?: kotlin.run {
                         if(lastItemName == null) _uiState.postValue(UIState.Error)
                     }

@@ -2,27 +2,25 @@ package com.andrefpc.ui
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.andrefpc.R
 import com.andrefpc.data.RedditData
 import com.andrefpc.data.UIState
 import com.andrefpc.databinding.ActivityMainBinding
-import com.andrefpc.extensions.ImageViewExtensions.loadImage
-import com.andrefpc.extensions.VideoViewExtensions.loadVideo
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import com.andrefpc.extensions.WebViewExtensions.loadVideo
-import android.util.DisplayMetrics
-
-
-
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModel()
     private var postsAdapter: PostsAdapter? = null
+
+    private var layoutManager: LinearLayoutManager? = null
+    private var onScrollListener: RecyclerView.OnScrollListener? = null
+    private var countRemoved = 0
+    private var loading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,42 +36,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun initPosts() {
         postsAdapter = PostsAdapter()
-        binding.postsList.layoutManager = LinearLayoutManager(this)
+        layoutManager = LinearLayoutManager(this)
+        binding.postsList.layoutManager = layoutManager
         binding.postsList.adapter = postsAdapter
         postsAdapter?.onSelect {
             binding.drawerLayout.close()
             openContent(it)
         }
+        postsAdapter?.onRemove {
+            countRemoved++
+            if(countRemoved == 5){
+                reloadList()
+                countRemoved = 0
+            }
+        }
+        listenScroll()
     }
 
     private fun openContent(data: RedditData) {
         binding.appBarMain.toolbar.title = data.author
-        val contentLayout = binding.appBarMain.contentMain.contentLayout
-        contentLayout.contentSubreddit.text = data.getPostedBy()
-        contentLayout.contentTitle.text = data.title
-        data.media?.video?.let {
-            contentLayout.contentVideo.loadVideo(it.url, it.width, it.height)
-            contentLayout.contentImage.visibility = View.GONE
-            contentLayout.contentVideo.visibility = View.VISIBLE
-            contentLayout.contentEmbed.visibility = View.GONE
-        } ?: kotlin.run {
-            data.media?.embed?.let {
-                contentLayout.contentEmbed.loadVideo(it)
-                contentLayout.contentImage.visibility = View.GONE
-                contentLayout.contentVideo.visibility = View.GONE
-                contentLayout.contentEmbed.visibility = View.VISIBLE
-            } ?: kotlin.run {
-                data.imageUrl?.let {
-                    contentLayout.contentImage.loadImage(it)
-                } ?: kotlin.run {
-                    contentLayout.contentImage.loadImage(data.thumbnail)
-                }
-                contentLayout.contentImage.visibility = View.VISIBLE
-                contentLayout.contentVideo.visibility = View.GONE
-                contentLayout.contentEmbed.visibility = View.GONE
-            }
-
-        }
+        binding.appBarMain.contentMain.contentLayout.setupLayout(data)
         binding.appBarMain.contentMain.mainViewFlipper.displayedChild = CONTENT_LAYOUT
     }
 
@@ -100,8 +82,15 @@ class MainActivity : AppCompatActivity() {
                     if (binding.postsViewFlipper.displayedChild == ERROR_DRAWER_LAYOUT) return@observe
                     binding.postsViewFlipper.displayedChild = ERROR_DRAWER_LAYOUT
                 }
-                is UIState.Success -> {
+                is UIState.RefreshList -> {
+                    loading = false
                     postsAdapter?.refreshList(it.children)
+                    if (binding.postsViewFlipper.displayedChild == SUCCESS_DRAWER_LAYOUT) return@observe
+                    binding.postsViewFlipper.displayedChild = SUCCESS_DRAWER_LAYOUT
+                }
+                is UIState.AddList -> {
+                    loading = false
+                    postsAdapter?.addList(it.children)
                     if (binding.postsViewFlipper.displayedChild == SUCCESS_DRAWER_LAYOUT) return@observe
                     binding.postsViewFlipper.displayedChild = SUCCESS_DRAWER_LAYOUT
                 }
@@ -114,6 +103,28 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout.open()
         }
         return super.onOptionsItemSelected(menuItem)
+    }
+
+    private fun listenScroll() {
+        onScrollListener = object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                layoutManager?.let { manager ->
+                    val visibleItemCount: Int = manager.childCount
+                    val totalItemCount: Int = manager.itemCount
+                    val pastVisibleItems: Int = manager.findFirstVisibleItemPosition()
+                    if (!loading && pastVisibleItems + visibleItemCount >= totalItemCount - 5) {
+                        reloadList()
+                    }
+                }
+            }
+        }
+        onScrollListener?.let { binding.postsList.addOnScrollListener(it) }
+    }
+
+    private fun reloadList() {
+        val lastItemName = postsAdapter?.getLastItemName()
+        viewModel.getPosts(lastItemName)
+        loading = true
     }
 
     companion object {

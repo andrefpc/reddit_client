@@ -1,13 +1,15 @@
 package com.andrefpc.extensions
 
-import android.animation.ValueAnimator
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
+import com.andrefpc.extensions.ViewExtensions.blink
+import com.andrefpc.extensions.ViewExtensions.stopBlink
 
 object ViewExtensions {
     fun View.blink() {
+        this.alpha = 1.0f
+        this.visibility = View.VISIBLE
         val anim: Animation = AlphaAnimation(0.0f, 1.0f)
         anim.duration = 1000
         anim.startOffset = 0
@@ -18,24 +20,6 @@ object ViewExtensions {
 
     fun View.stopBlink() {
         this.alpha = 0.0f
-    }
-
-    fun View.collapseHorizontal() {
-        val initialWidth = this.measuredWidth
-        val valueAnimator = ValueAnimator.ofFloat(0f, 1f)
-        valueAnimator.addUpdateListener {
-            val value = it.animatedValue as Float
-            if (value == 1f) {
-                this@collapseHorizontal.visibility = View.GONE
-            } else {
-                this@collapseHorizontal.layoutParams.width =
-                    initialWidth - (initialWidth * value).toInt()
-                this@collapseHorizontal.requestLayout()
-            }
-        }
-
-        valueAnimator.interpolator = LinearInterpolator()
-        valueAnimator.duration = 100L
-        valueAnimator.start()
+        this.visibility = View.GONE
     }
 }

@@ -18,9 +18,10 @@
             android:id="@+id/empty_layout"
             layout="@layout/empty_layout" />
 
-        <include
+        <com.andrefpc.widget.CustomContentView
             android:id="@+id/content_layout"
-            layout="@layout/content_layout" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </ViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

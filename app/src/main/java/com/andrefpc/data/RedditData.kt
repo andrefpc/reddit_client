@@ -12,7 +12,8 @@ data class RedditData(
     @SerializedName("thumbnail") val thumbnail: String,
     @SerializedName("num_comments") val numComments: Int,
     @SerializedName("secure_media") val media: RedditMedia?,
-    @SerializedName("url") val imageUrl: String?
+    @SerializedName("post_hint") val postHint: String?,
+    @SerializedName("url") val url: String
 ) : Serializable {
     fun getTime(): String {
         val now = System.currentTimeMillis()

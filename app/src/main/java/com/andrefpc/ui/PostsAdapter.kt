@@ -9,20 +9,28 @@ import com.andrefpc.data.RedditData
 import com.andrefpc.databinding.PostLayoutBinding
 import com.andrefpc.extensions.ImageViewExtensions.loadImage
 import com.andrefpc.extensions.ViewExtensions.blink
-import com.andrefpc.extensions.ViewExtensions.collapseHorizontal
 import com.andrefpc.extensions.ViewExtensions.stopBlink
 
 
 class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val postList: ArrayList<RedditChild> = arrayListOf()
     private var selectListener: (RedditData) -> Unit = { }
+    private var removeListener: () -> Unit = { }
 
     fun onSelect(selectListener: (RedditData) -> Unit) {
         this.selectListener = selectListener
     }
 
-    fun refreshList(list: List<RedditChild>){
-        if(postList.isNotEmpty()) {
+    fun onRemove(removeListener: () -> Unit) {
+        this.removeListener = removeListener
+    }
+
+    fun getLastItemName(): String {
+        return postList[postList.size - 1].data.name
+    }
+
+    fun refreshList(list: List<RedditChild>) {
+        if (postList.isNotEmpty()) {
             val oldListCount = postList.size
             postList.clear()
             notifyItemRangeRemoved(0, oldListCount)
@@ -31,7 +39,7 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyItemRangeInserted(0, list.size)
     }
 
-    fun addList(list: List<RedditChild>){
+    fun addList(list: List<RedditChild>) {
         val positionStart = postList.size
         postList.addAll(list)
         notifyItemRangeInserted(positionStart, list.size)
@@ -57,18 +65,23 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val child: RedditChild = postList[position]
         val data: RedditData = child.data
         holder.binding.postAuthor.text = data.author
-        holder.binding.postImage.loadImage(data.thumbnail)
+        holder.binding.postImage.loadImage(data.thumbnail) {
+            holder.binding.postImage.visibility = View.GONE
+        }
         holder.binding.postText.text = data.title
         holder.binding.postTime.text = data.getTime()
         holder.binding.postComments.text = data.getComments()
-        if(!child.read) holder.binding.postRead.blink()
-        else holder.binding.postRead.visibility = View.GONE
+        if (!child.read) holder.binding.postRead.blink()
+        else holder.binding.postRead.stopBlink()
         holder.binding.root.setOnClickListener {
             holder.binding.postRead.stopBlink()
-            holder.binding.postRead.collapseHorizontal()
+            child.read = true
             selectListener(data)
         }
-        holder.binding.postClear.setOnClickListener { removePost(data.name) }
+        holder.binding.postClear.setOnClickListener {
+            removeListener()
+            removePost(data.name)
+        }
     }
 
     override fun getItemCount(): Int {

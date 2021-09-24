@@ -5,7 +5,7 @@ import com.andrefpc.data.RedditEmbed
 
 
 object WebViewExtensions {
-    fun WebView.loadVideo(embed: RedditEmbed) {
+    fun WebView.loadEmbed(embed: RedditEmbed) {
         this.setInitialScale(1)
         this.settings.allowFileAccess = true
         this.settings.javaScriptEnabled = true
