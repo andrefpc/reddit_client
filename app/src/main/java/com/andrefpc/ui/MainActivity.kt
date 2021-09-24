@@ -67,6 +67,10 @@ class MainActivity : AppCompatActivity() {
             val lastItemName = postsAdapter?.getLastItemName()
             viewModel.getPosts(lastItemName, true)
         }
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.getPosts(refresh = true)
+            binding.swipeRefresh.isRefreshing = false
+        }
     }
 
     private fun setupActionBar() {

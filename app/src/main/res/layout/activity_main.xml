@@ -38,12 +38,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/posts_list"
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipe_refresh"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingBottom="60dp"
-                    android:clipToPadding="false"/>
+                    android:layout_height="match_parent">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/posts_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingBottom="60dp"
+                        android:clipToPadding="false"/>
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/clear_button"
