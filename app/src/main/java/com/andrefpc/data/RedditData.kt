@@ -11,7 +11,8 @@ data class RedditData(
     @SerializedName("created") val created: Long,
     @SerializedName("thumbnail") val thumbnail: String,
     @SerializedName("num_comments") val numComments: Int,
-    @SerializedName("secure_media") val media: RedditMedia
+    @SerializedName("secure_media") val media: RedditMedia?,
+    @SerializedName("url") val imageUrl: String?
 ) : Serializable {
     fun getTime(): String {
         val now = System.currentTimeMillis()
@@ -40,5 +41,9 @@ data class RedditData(
                 "$numComments comments"
             }
         }
+    }
+
+    fun getPostedBy(): String {
+        return "Posted by $subreddit"
     }
 }

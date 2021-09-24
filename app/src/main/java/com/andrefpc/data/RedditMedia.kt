@@ -4,5 +4,6 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 data class RedditMedia(
-    @SerializedName("reddit_video") var video: RedditVideo
+    @SerializedName("reddit_video") var video: RedditVideo?,
+    @SerializedName("oembed") var embed: RedditEmbed?
 ): Serializable

@@ -17,6 +17,10 @@
         <include
             android:id="@+id/empty_layout"
             layout="@layout/empty_layout" />
+
+        <include
+            android:id="@+id/content_layout"
+            layout="@layout/content_layout" />
     </ViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

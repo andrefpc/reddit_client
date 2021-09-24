@@ -8,8 +8,6 @@ import com.andrefpc.data.RedditChild
 import com.andrefpc.data.RedditData
 import com.andrefpc.databinding.PostLayoutBinding
 import com.andrefpc.extensions.ImageViewExtensions.loadImage
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
 import com.andrefpc.extensions.ViewExtensions.blink
 import com.andrefpc.extensions.ViewExtensions.collapseHorizontal
 import com.andrefpc.extensions.ViewExtensions.stopBlink
