@@ -1,5 +1,7 @@
 package com.andrefpc.data
 
+import com.andrefpc.extensions.StringExtensions.isImageURL
+import com.andrefpc.extensions.StringExtensions.isValidUrl
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
@@ -46,5 +48,13 @@ data class RedditData(
 
     fun getPostedBy(): String {
         return "Posted by $subreddit"
+    }
+
+    fun isImage(): Boolean{
+        return postHint == "image" || url.isImageURL()
+    }
+
+    fun isLink(): Boolean{
+        return postHint == "link" || (postHint == null && url.isValidUrl())
     }
 }

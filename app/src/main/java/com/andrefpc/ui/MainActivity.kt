@@ -1,8 +1,13 @@
 package com.andrefpc.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.andrefpc.R
@@ -21,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private var onScrollListener: RecyclerView.OnScrollListener? = null
     private var countRemoved = 0
     private var loading = false
+    private var menu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +63,13 @@ class MainActivity : AppCompatActivity() {
         binding.appBarMain.toolbar.title = data.author
         binding.appBarMain.contentMain.contentLayout.setupLayout(data)
         binding.appBarMain.contentMain.mainViewFlipper.displayedChild = CONTENT_LAYOUT
+        if (data.isImage()) {
+            viewModel.currentImageUrl = data.url
+            showDownloadButton()
+        } else {
+            viewModel.currentImageUrl = null
+            hideDownloadButton()
+        }
     }
 
     private fun initListeners() {
@@ -73,6 +86,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showDownloadButton() {
+        menu?.findItem(R.id.download_image)?.isVisible = true
+    }
+
+    private fun hideDownloadButton() {
+        menu?.findItem(R.id.download_image)?.isVisible = false
+    }
+
     private fun setupActionBar() {
         setSupportActionBar(binding.appBarMain.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -81,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupViewModelObservers() {
         viewModel.uiState.observe(this, {
-            when(it){
+            when (it) {
                 UIState.Loading -> {
                     if (binding.postsViewFlipper.displayedChild == LOADING_DRAWER_LAYOUT) return@observe
                     binding.postsViewFlipper.displayedChild = LOADING_DRAWER_LAYOUT
@@ -106,9 +127,22 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        this.menu = menu
+        menu?.findItem(R.id.download_image)?.isVisible = false
+        return true
+    }
+
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
-        if (menuItem.itemId == android.R.id.home) {
-            binding.drawerLayout.open()
+        when (menuItem.itemId) {
+            android.R.id.home -> binding.drawerLayout.open()
+            R.id.download_image -> {
+                if(haveExternalStoragePermission()) {
+                    viewModel.saveCurrentImage()
+                    Toast.makeText(this, "Image saved on gallery", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         return super.onOptionsItemSelected(menuItem)
     }
@@ -135,11 +169,45 @@ class MainActivity : AppCompatActivity() {
         loading = true
     }
 
-    companion object {
-        const val LOADING_DRAWER_LAYOUT = 0
-        const val ERROR_DRAWER_LAYOUT = 1
-        const val SUCCESS_DRAWER_LAYOUT = 2
+    private fun haveExternalStoragePermission(): Boolean {
+        return if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            true
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                0
+            )
+            false
+        }
+    }
 
-        const val CONTENT_LAYOUT = 1
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            viewModel.saveCurrentImage()
+        } else {
+            Toast.makeText(
+                this,
+                "You don't give permission to do this action",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    companion object {
+        private const val LOADING_DRAWER_LAYOUT = 0
+        private const val ERROR_DRAWER_LAYOUT = 1
+        private const val SUCCESS_DRAWER_LAYOUT = 2
+
+        private const val CONTENT_LAYOUT = 1
     }
 }

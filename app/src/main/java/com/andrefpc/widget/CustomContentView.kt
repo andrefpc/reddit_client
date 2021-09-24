@@ -16,6 +16,12 @@ import android.net.Uri
 import androidx.core.content.ContextCompat
 import com.andrefpc.extensions.StringExtensions.isImageURL
 import com.andrefpc.extensions.StringExtensions.isValidUrl
+import android.text.style.UnderlineSpan
+
+import android.text.SpannableString
+
+
+
 
 
 class CustomContentView @JvmOverloads constructor(
@@ -43,7 +49,7 @@ class CustomContentView @JvmOverloads constructor(
             return
         }
 
-        if(data.postHint == "image" || data.url.isImageURL()){
+        if(data.isImage()){
             binding.contentImage.loadImage(data.url) {
                 binding.contentImage.loadImage(data.thumbnail)
             }
@@ -51,8 +57,10 @@ class CustomContentView @JvmOverloads constructor(
             return
         }
 
-        if(data.postHint == "link" || (data.postHint == null && data.url.isValidUrl())){
-            binding.contentLink.text = data.url
+        if(data.isLink()){
+            val content = SpannableString(data.url)
+            content.setSpan(UnderlineSpan(), 0, content.length, 0)
+            binding.contentLink.text = content
             binding.contentFlipper.displayedChild = LINK_LAYOUT
             binding.contentLink.setOnClickListener {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(data.url))

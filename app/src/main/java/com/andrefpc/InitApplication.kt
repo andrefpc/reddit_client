@@ -17,7 +17,8 @@ class InitApplication: Application() {
                     repositoryModule,
                     viewModelModule,
                     remoteModule,
-                    coroutineContextProviderModule
+                    coroutineContextProviderModule,
+                    utilModule
                 )
             )
         }

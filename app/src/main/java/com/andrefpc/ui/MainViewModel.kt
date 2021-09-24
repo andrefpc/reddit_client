@@ -8,12 +8,16 @@ import com.andrefpc.data.ApiResult
 import com.andrefpc.data.UIState
 import com.andrefpc.repository.RedditRepository
 import com.andrefpc.util.CoroutineContextProvider
+import com.andrefpc.util.image.ImageUtil
 import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val dispatchers: CoroutineContextProvider,
-    private val redditRepository: RedditRepository
+    private val redditRepository: RedditRepository,
+    private val imageUtil: ImageUtil
 ): ViewModel() {
+    var currentImageUrl: String? = null
+
     private val _uiState = MutableLiveData<UIState>()
     val uiState: LiveData<UIState> get() = _uiState
 
@@ -37,4 +41,12 @@ class MainViewModel(
             }
         }
     }
+
+    fun saveCurrentImage(){
+        viewModelScope.launch(dispatchers.IO) {
+            currentImageUrl?.let {  imageUtil.saveImageOnGallery(it) }
+        }
+    }
+
+
 }

@@ -6,4 +6,5 @@
     <string name="list_button">OPEN THE LIST</string>
     <string name="clear_button">DISMISS LIST AND RELOAD</string>
     <string name="dismiss_post">Dismiss Post</string>
+    <string name="download_image">Download</string>
 </resources>

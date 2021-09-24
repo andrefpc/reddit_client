@@ -5,6 +5,8 @@ import com.andrefpc.repository.RedditRepository
 import com.andrefpc.repository.RedditRepositoryImpl
 import com.andrefpc.ui.MainViewModel
 import com.andrefpc.util.CoroutineContextProvider
+import com.andrefpc.util.image.ImageUtil
+import com.andrefpc.util.image.ImageUtilImpl
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -22,7 +24,8 @@ val viewModelModule = module {
     viewModel {
         MainViewModel(
             dispatchers = get(),
-            redditRepository = get()
+            redditRepository = get(),
+            imageUtil = get()
         )
     }
 }
@@ -34,4 +37,10 @@ val remoteModule = module {
 
 val coroutineContextProviderModule = module {
     single { CoroutineContextProvider() }
+}
+
+val utilModule = module {
+    factory<ImageUtil> {
+        ImageUtilImpl(context = get())
+    }
 }
