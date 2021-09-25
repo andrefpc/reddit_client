@@ -43,8 +43,8 @@ class ImageUtilImpl(
             uri?.let {
                 if (image != null) {
                     val imageOut: OutputStream? = contentResolver.openOutputStream(it)
-                    imageOut.use { imageOut ->
-                        image.compress(Bitmap.CompressFormat.JPEG, 100, imageOut)
+                    imageOut.use { out ->
+                        image.compress(Bitmap.CompressFormat.JPEG, 100, out)
                     }
                 } else {
                     contentResolver.delete(it, null, null)

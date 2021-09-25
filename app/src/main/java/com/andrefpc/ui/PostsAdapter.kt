@@ -3,6 +3,7 @@ package com.andrefpc.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import androidx.recyclerview.widget.RecyclerView
 import com.andrefpc.data.RedditChild
 import com.andrefpc.data.RedditData
@@ -93,10 +94,11 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         holder.binding.postText.text = data.title
         holder.binding.postTime.text = data.getTime()
         holder.binding.postComments.text = data.getComments()
-        if (!child.read) holder.binding.postRead.blink()
-        else holder.binding.postRead.stopBlink()
+        var animation: Animation? = null
+        if (!child.read) animation = holder.binding.postRead.blink()
+        else holder.binding.postRead.stopBlink(animation)
         holder.binding.root.setOnClickListener {
-            holder.binding.postRead.stopBlink()
+            holder.binding.postRead.stopBlink(animation)
             child.read = true
             selectListener(data)
         }

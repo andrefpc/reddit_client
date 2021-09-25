@@ -42,7 +42,7 @@ object ImageViewExtensions {
                 }
             ).into(this)
         } else {
-            this.setImageResource(R.drawable.ic_reddit)
+            returnError()
         }
     }
 }

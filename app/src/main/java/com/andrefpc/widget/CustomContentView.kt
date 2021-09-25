@@ -32,6 +32,10 @@ class CustomContentView @JvmOverloads constructor(
     private val binding: ContentLayoutBinding =
         ContentLayoutBinding.inflate(LayoutInflater.from(context), this, true)
 
+    /**
+     * Setup the content layout using the reddit data
+     * @param data data selected on the list
+     */
     fun setupLayout(data: RedditData){
         binding.contentSubreddit.text = data.getPostedBy()
         binding.contentTitle.text = data.title
